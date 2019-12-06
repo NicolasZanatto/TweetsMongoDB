@@ -46,7 +46,7 @@ public class ConnectionMongoDB {
 
 	}
 	
-	static String algorithm = "DESede";
+	public String algorithm = "DESede";
 
 	public DBCollection ObterTweetCollection() throws UnknownHostException {
 		
@@ -90,14 +90,14 @@ public class ConnectionMongoDB {
 		return retorno;
 	}
 	
-	private static byte[] encryptF(String input, Key pkey, Cipher c) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+	public byte[] encryptF(String input, Key pkey, Cipher c) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
 
 		c.init(Cipher.ENCRYPT_MODE, pkey);
 		byte[] inputBytes = input.getBytes();
 		return c.doFinal(inputBytes);
 	}
 
-	private static String decryptF(byte[] encryptionBytes, Key pkey, Cipher c) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+	public String decryptF(byte[] encryptionBytes, Key pkey, Cipher c) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
 
 		c.init(Cipher.DECRYPT_MODE, pkey);
 
@@ -109,55 +109,12 @@ public class ConnectionMongoDB {
 	}
 	
 	
-	public void BuscaArquivoPorID(long chave) throws IOException {
-		ConnectionMongoDB connectionMongo = new ConnectionMongoDB();
-		try {
-			DBCollection collection = connectionMongo.ObterTweetCollection();
-			BasicDBObject searchQuery = new BasicDBObject();
-			searchQuery.put("_idTwitter", chave);
-			DBCursor cursor = collection.find(searchQuery);
-			while (cursor.hasNext()) {
-				System.out.println(cursor.next());
-			}
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-	}
-	public void BuscaArquivoPorHashTag(String hashtag) throws IOException {
-		DBCollection collection = this.ObterTweetCollection();
-		SecretKey symKey = this.ObterSecretKey();
-		try {
-			Cipher c = Cipher.getInstance(algorithm);	
-			byte[] encryptionBytes = encryptF(hashtag,symKey,c);
-			String hashtagscript = new String(encryptionBytes);
-			
-			BasicDBObject searchQuery = new BasicDBObject();
-			searchQuery.put("hashtags", hashtagscript);
-			DBCursor cursor = collection.find(searchQuery);
-			int count = 0;
-			while (cursor.hasNext()) {
-				count++;
-				System.out.println(cursor.next());
-			}
-			System.out.println("Quantidade:" + count);
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (BadPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalBlockSizeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 	
+	
+	public String getAlgorithm() {
+		return algorithm;
+	}
+
 	public SecretKey GerarSymKey() throws NoSuchAlgorithmException{
 		return KeyGenerator.getInstance(algorithm).generateKey();
 	}

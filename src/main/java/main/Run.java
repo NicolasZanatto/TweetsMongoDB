@@ -13,14 +13,15 @@ import com.mongodb.DBObject;
 
 import dao.ConnectionDadosArquivo;
 import dao.ConnectionMongoDB;
+import dao.Consultas;
 import model.Tweet;
 
 public class Run {
 
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
 		//InserirDados(); //RODAR SOMENTE UMA VEZ
-		ConnectionMongoDB connectionMongo = new ConnectionMongoDB();
-		connectionMongo.BuscaArquivoPorHashTag("Browns");
+		Consultas consultas = new Consultas();
+		consultas.MostrarTimeMaisComentado();
 	}
 	
 	public static void InserirDados() throws IOException, NoSuchAlgorithmException {
