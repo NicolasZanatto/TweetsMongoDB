@@ -29,7 +29,7 @@ import model.Tweet;
 public class ConnectionMongoDB {
 	
 	public static void main(String[] args) throws Exception{
-		
+		/*
 		SecretKey symKey = KeyGenerator.getInstance(algorithm).generateKey();
 	    Cipher c = Cipher.getInstance(algorithm);
 		byte[] encryptionBytes = encryptF("Browns",symKey,c);
@@ -42,7 +42,7 @@ public class ConnectionMongoDB {
 		SecretKey secretKey = new SecretKeySpec(encoded, "DESede");
 
 		
-		System.out.println("Decrypted: " + decryptF(encryptionBytes,secretKey,c));
+		System.out.println("Decrypted: " + decryptF(encryptionBytes,secretKey,c));*/
 
 	}
 	

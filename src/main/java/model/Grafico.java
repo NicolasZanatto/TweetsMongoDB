@@ -1,6 +1,9 @@
 package model;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
+import java.text.ParseException;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
@@ -20,15 +23,32 @@ import com.mongodb.DBObject;
 import com.orsoncharts.Chart3D;
 
 import dao.ConnectionMongoDB;
+import dao.Consultas;
 
 public class Grafico extends JFrame{
 	
-	public void GraficoPizza()
+	public void BuscaDadosGraficoBarra() throws IOException, ParseException
+	{	
+		Consultas consulta = new Consultas();
+		GraficoBarra(consulta.BuscaTodasDatas());
+		this.setVisible(true);
+	}
+	
+	public void BuscaDadosGraficoPizza() throws IOException
+	{	
+		Consultas consulta = new Consultas();
+		GraficoPizza(consulta.BuscaTodasHashtags());
+		this.setVisible(true);
+	}
+	
+	public void GraficoPizza(ArrayList<Dados> listaDados)
 	{
 		DefaultPieDataset dataPie = new DefaultPieDataset();
-		dataPie.setValue("Giants", 7);
-		dataPie.setValue("Seahawks", 8);
-		dataPie.setValue("Saints", 5);
+		
+		for(Dados linha: listaDados)
+		{
+			dataPie.setValue(linha.getNome(), linha.getValor());
+		}
 		
 		JFreeChart grafico = ChartFactory.createPieChart(
 				"Gráfico",  // chart title
@@ -42,15 +62,17 @@ public class Grafico extends JFrame{
 		
 		this.pack();
 	}
-	public void GraficoBarra()
+	
+	
+	public void GraficoBarra( ArrayList<Dados> listaDados )
 	{	
 
-		CategoryDataset dataBar = AddDadosGraficoBarra(); 
+		CategoryDataset dataBar = AddDadosGraficoBarra(listaDados); 
 		
 		JFreeChart chart = ChartFactory.createBarChart(
 		        "Gráfico", //Chart Title
-		        "Year", // Category axis
-		        "Hashtags", // Value axis
+		        "Times", // Category axis
+		        "Quantidade de Hashtags", // Value axis
 		        dataBar,
 		        PlotOrientation.VERTICAL,
 		        true,true,false
@@ -59,19 +81,21 @@ public class Grafico extends JFrame{
 		this.add( new ChartPanel(chart) );
 		
 		this.pack();
+
 	}
 	
-	private CategoryDataset AddDadosGraficoBarra() 
+	private CategoryDataset AddDadosGraficoBarra( ArrayList<Dados> listaDados ) 
 	{	
 	    DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-		dataset.addValue(5, "Seahawks", "Seahawks");
-		//
-		dataset.addValue(10, "Giants", "Giants");
-		dataset.addValue(8, "Saints", "Saints");
-		//
+	    
+	    for(Dados linha: listaDados)
+	    {
+	    	dataset.addValue(linha.getValor(), linha.getNome(), linha.getNome());
+	    }
+
 	    return dataset;
 	  }
-	
+	/*
 	public DefaultPieDataset AddDadosGraficoPizza(String texto, int quant)
 	{
 		DefaultPieDataset dataPie = new DefaultPieDataset();
@@ -79,16 +103,26 @@ public class Grafico extends JFrame{
 		
 		return dataPie;
 	}
-
-
+*/
+/*
 	public static void main(String[] args)
 	{
-
+		ArrayList<Dados> lista = new ArrayList<>();
+		String[] nomes = {"Saints", "Giants", "Falcons"};;
+		
+		System.out.println(nomes.length);
+		
+		for(int i = 0; i<nomes.length;i++)
+		{
+			Dados dados = new Dados(nomes[i], i+4);
+			lista.add(dados);
+		}
+		
 		Grafico grafico = new Grafico();
-		/* Descomentar a linha para exibir*/
-		//grafico.GraficoBarra();
-		grafico.GraficoPizza();
+
+		//grafico.GraficoBarra(lista);
+		grafico.GraficoPizza(lista);
 		
 		grafico.setVisible(true);
-	}
+	}*/
 }

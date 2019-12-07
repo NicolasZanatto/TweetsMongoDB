@@ -4,7 +4,12 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.crypto.BadPaddingException;
@@ -16,6 +21,9 @@ import javax.crypto.SecretKey;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+
+import model.Dados;
 
 public class Consultas {
 	
@@ -33,6 +41,25 @@ public class Consultas {
 			e.printStackTrace();
 		}
 	}
+	
+	public DBCursor ObterTweetsPorData() throws IOException 
+	{
+		ConnectionMongoDB connectionMongo = new ConnectionMongoDB();
+		DBCollection collection = connectionMongo.ObterTweetCollection();
+		
+		BasicDBObject fields = new BasicDBObject();
+		 fields.put("data", "0");
+
+		DBCursor cursor = collection.find(new BasicDBObject(),fields);
+		/*
+	    while (cursor.hasNext()) 
+	    {
+	    	BasicDBObject object = (BasicDBObject)cursor.next();
+	        System.out.println(object.getString("data"));
+	    }*/
+		return cursor;
+	}
+	
 	public long ObterQuantidadeTweetsPorHashTag(String hashtag) throws IOException {
 		ConnectionMongoDB connectionMongo = new ConnectionMongoDB();
 		DBCollection collection = connectionMongo.ObterTweetCollection();
@@ -69,6 +96,79 @@ public class Consultas {
 		for(String hashtag : this.ObterListaHashtagsTimes()) {
 			System.out.println(hashtag + ", qntd: " + ObterQuantidadeTweetsPorHashTag(hashtag));
 		}
+	}
+	
+	public ArrayList<Dados> BuscaTodasHashtags() throws IOException
+	{
+		ArrayList<Dados> retorno = new ArrayList<Dados>();
+		
+		long qntd = 0;
+		for(String hashtag : this.ObterListaHashtagsTimes())
+		{
+			qntd = ObterQuantidadeTweetsPorHashTag(hashtag);
+			Dados dados = new Dados(hashtag, (int) qntd);
+			retorno.add(dados);
+
+		}
+		
+		return retorno;
+	}
+	
+	public String ConverteMes(String mes)
+	{
+		String retorno = new String();
+		
+		if(mes.equals("Oct"))
+		{
+			retorno = "10";
+		}
+		else if(mes.equals("Nov"))
+		{
+			retorno = "11";
+		}
+		else
+		{
+			retorno = "10";
+		}
+		
+		return retorno;
+	}
+	
+	public ArrayList<Dados> BuscaTodasDatas() throws IOException, ParseException
+	{
+		
+		ArrayList<Dados> retorno = new ArrayList<>();
+
+		DBCursor cursor = ObterTweetsPorData();
+		
+	    while (cursor.hasNext()) 
+	    {
+	    	BasicDBObject object = (BasicDBObject)cursor.next();
+	    	String str = object.getString("data");
+	    	String data = str.substring(8, 10) + "/" + this.ConverteMes(str.substring(4, 7)) + "/"  + str.substring(24, 28);
+	    	boolean flag = false;
+	    	int indice = 0;
+	    	for(Dados linha: retorno)
+	    	{	
+	    		//Se a linha já existe
+	    		if(linha.getNome().equals(data))
+	    		{
+	    			flag = true; //Marca que existe
+	    			Dados dados = new Dados(data, linha.getValor()+1);
+	    			retorno.set(indice, dados);//Altera a linha adicionando um valor
+	    			
+	    		}
+	    		indice++;
+	    	}
+	    	
+	    	if(!flag) //Linha ainda nao existe
+	    	{
+	    		Dados dados = new Dados(data, 1);
+	    		retorno.add(dados);
+	    	}
+	    }
+		
+		return retorno;
 	}
 	
 	public void MostrarTimeMaisComentado() throws IOException {
