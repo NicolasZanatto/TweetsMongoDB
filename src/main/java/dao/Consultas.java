@@ -145,27 +145,29 @@ public class Consultas {
 	    {
 	    	BasicDBObject object = (BasicDBObject)cursor.next();
 	    	String str = object.getString("data");
-	    	String data = str.substring(8, 10) + "/" + this.ConverteMes(str.substring(4, 7)) + "/"  + str.substring(24, 28);
-	    	boolean flag = false;
-	    	int indice = 0;
-	    	for(Dados linha: retorno)
-	    	{	
-	    		//Se a linha já existe
-	    		if(linha.getNome().equals(data))
-	    		{
-	    			flag = true; //Marca que existe
-	    			Dados dados = new Dados(data, linha.getValor()+1);
-	    			retorno.set(indice, dados);//Altera a linha adicionando um valor
-	    			
-	    		}
-	    		indice++;
-	    	}
-	    	
-	    	if(!flag) //Linha ainda nao existe
-	    	{
-	    		Dados dados = new Dados(data, 1);
-	    		retorno.add(dados);
-	    	}
+		    if(str != null) {
+		    	String data = str.substring(8, 10) + "/" + this.ConverteMes(str.substring(4, 7)) + "/"  + str.substring(24, 28);
+		    	boolean flag = false;
+		    	int indice = 0;
+		    	for(Dados linha: retorno)
+		    	{			
+		    		//Se a linha já existe
+		    		if(linha.getNome().equals(data))
+		    		{
+		    			flag = true; //Marca que existe
+		    			Dados dados = new Dados(data, linha.getValor()+1);
+		    			retorno.set(indice, dados);//Altera a linha adicionando um valor
+		    			
+		    		}
+		    		indice++;
+		    	}
+		    	
+		    	if(!flag) //Linha ainda nao existe
+		    	{
+		    		Dados dados = new Dados(data, 1);
+		    		retorno.add(dados);
+		    	}
+		    }
 	    }
 		
 		return retorno;
