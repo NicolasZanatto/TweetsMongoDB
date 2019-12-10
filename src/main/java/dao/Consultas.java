@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
@@ -51,14 +52,31 @@ public class Consultas {
 		 fields.put("data", "0");
 
 		DBCursor cursor = collection.find(new BasicDBObject(),fields);
-		/*
-	    while (cursor.hasNext()) 
+		
+	    /*while (cursor.hasNext()) 
 	    {
 	    	BasicDBObject object = (BasicDBObject)cursor.next();
-	        System.out.println(object.getString("data"));
+	        System.out.println(cursor.next());
 	    }*/
 		return cursor;
 	}
+	
+	public DBCursor ObterTweetsPorDataParaConsulta(java.util.Date date1) throws IOException 
+	{
+		ConnectionMongoDB connectionMongo = new ConnectionMongoDB();
+		DBCollection collection = connectionMongo.ObterTweetCollection();
+		
+		BasicDBObject fields = new BasicDBObject();
+		 fields.put("data", date1);
+
+		DBCursor cursor = collection.find(fields);
+		while (cursor.hasNext()) {
+			System.out.println(cursor.next());
+		}
+		return cursor;
+	}
+
+	
 	
 	public long ObterQuantidadeTweetsPorHashTag(String hashtag) throws IOException {
 		ConnectionMongoDB connectionMongo = new ConnectionMongoDB();
@@ -73,6 +91,40 @@ public class Consultas {
 			searchQuery.put("hashtags", hashtagscript);
 			return collection.count(searchQuery);
 			
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalBlockSizeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return 0;
+	}
+	
+	public long ObterTweetsPorHashTag(String hashtag) throws IOException {
+		ConnectionMongoDB connectionMongo = new ConnectionMongoDB();
+		DBCollection collection = connectionMongo.ObterTweetCollection();
+		SecretKey symKey = connectionMongo.ObterSecretKey();
+		try {
+			Cipher c = Cipher.getInstance(connectionMongo.getAlgorithm());	
+			byte[] encryptionBytes = connectionMongo.encryptF(hashtag,symKey,c);
+			String hashtagscript = new String(encryptionBytes);
+			
+			BasicDBObject searchQuery = new BasicDBObject();
+			searchQuery.put("hashtags", hashtagscript);
+			DBCursor cursor = collection.find(searchQuery);
+			while (cursor.hasNext()) {
+				System.out.println(cursor.next());
+			}
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

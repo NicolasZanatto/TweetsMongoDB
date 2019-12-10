@@ -71,8 +71,8 @@ public class Grafico extends JFrame{
 		
 		JFreeChart chart = ChartFactory.createBarChart(
 		        "Gráfico", //Chart Title
-		        "Times", // Category axis
-		        "Quantidade de Hashtags", // Value axis
+		        "Data", // Category axis
+		        "Quantidade de Tweets", // Value axis
 		        dataBar,
 		        PlotOrientation.VERTICAL,
 		        true,true,false
